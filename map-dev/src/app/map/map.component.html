@@ -1,0 +1,63 @@
+<div class="map-page">
+    <map-view [latitude]="defaultLat" [longitude]="defaultLng" [zoom]="defaultZoom" (mapClick)="getUserCoordinates($event)" (mapReady)="getMapInstance($event)">
+        <map-marker *ngIf="mapClicked" [latitude]="userlat" [longitude]="userlng" 
+            [iconUrl]="userMarker" title="User Current Location">
+            <map-info-window [isOpen]="true" [disableAutoPan]="true">
+                <h4>There are {{this.countedMarkersWithinRadius}} restaurant(s) within your 2km radius.</h4>            
+            </map-info-window>
+        </map-marker>
+
+        <map-circle *ngIf="mapClicked" [latitude]="userlat" [longitude]="userlng" [radius]="2000" [fillColor]="'#65c0e5'"></map-circle>
+    
+        <ng-container *ngIf="mapInstance && restoMarkers">
+            <map-marker *ngFor="let resto of restoMarkers"
+                [latitude]="resto.lat" [longitude]="resto.lng" 
+                [iconUrl]="resto.iconMarker" title="{{resto.name}}">
+                <map-info-window [isOpen]="false" [disableAutoPan]="true">
+                    <h4>{{resto.name}}</h4>
+                    <h4>{{resto.address}}</h4>
+                    <button *ngIf="createDirection" type="button" (click)="getDirection(resto.lat, resto.lng)">Get Direction</button>
+                    <button *ngIf="!createDirection" type="button" (click)="getDirection(resto.lat, resto.lng, true)">Cancel</button>
+                </map-info-window>
+            </map-marker>
+        </ng-container>
+
+        
+    </map-view>
+    
+    <div *ngIf="showLoader" class="loader-panel">
+        <span class="loader"></span>
+        <span class="progress">{{dataLoaded}} % loaded</span>
+    </div>
+
+    <div *ngIf="showLoaderPage" class="loader-page">
+        <span class="loader"></span>
+    </div>
+
+    <div class="right-panel">
+        <div class="note">Note: <br> Click anywhere in Cebu to mark user location.</div>      
+    </div>
+
+    <div class="left-panel">
+        <div class="panel-title">Restaurants</div>
+        <div class="resto-list">
+            <ul *ngIf="restoMarkers.length > 0" class="resto-content">
+                <li class="resto" *ngFor="let marker of restoMarkers">
+                    <div>Name: {{marker.name}}</div>
+                    <div>Address: {{marker.address}}</div>
+                </li>
+            </ul>
+            <div *ngIf="restoMarkers.length == 0" class="no-resto">
+                No record
+            </div>   
+        </div>     
+    </div>
+
+    <div *ngIf="userOutSideCebu" class="pop-up-notif">
+        <div class="notif">
+            <h3>User is outside Cebu. No restaurants to display.</h3>
+            <button type="button" (click)="closePopUpNotif()">Cancel</button>
+        </div>
+    </div>
+    
+</div>
